@@ -115,7 +115,7 @@ button{
 
 <script>
 /* ===== FETCH DATA.JSON ===== */
-fetch("data.json")
+fetch("https://raw.githubusercontent.com/Maxmentor/kapilpshow-s04/refs/heads/main/data.json")
 .then(response => response.json())
 .then(episodes => {
   const list = document.getElementById("episodeList");
