@@ -1,0 +1,4 @@
+<div class="buttons">
+           <button class="watch" onclick="watchNow('${ep.watchLink}')">
+              ▶ Watch Now
+            </button>
