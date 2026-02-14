@@ -110,15 +110,21 @@ button{
 <div class="topbar">NETFLIX [Kapil Show S04 2026]</div>
 <br>
 <marquee>New Episode Upload Every Saturday........</marquee>
+
 <!-- ===== EPISODES ===== -->
 <div class="container" id="episodeList"></div>
 
 <script>
-/* ===== FETCH DATA.JSON ===== */
-fetch("https://raw.githubusercontent.com/Maxmentor/kapilpshow-s04/refs/heads/main/data.json")
+/* ===== FETCH DATA.JSON WITH CACHE FIX ===== */
+
+// Har baar fresh load ke liye unique timestamp
+const jsonURL = "https://raw.githubusercontent.com/Maxmentor/kapilpshow-s04/refs/heads/main/data.json?v=" + new Date().getTime();
+
+fetch(jsonURL, { cache: "no-store" })
 .then(response => response.json())
 .then(episodes => {
   const list = document.getElementById("episodeList");
+  list.innerHTML = ""; // pehle container clear
 
   episodes.forEach(ep => {
     list.innerHTML += `
@@ -126,13 +132,9 @@ fetch("https://raw.githubusercontent.com/Maxmentor/kapilpshow-s04/refs/heads/mai
         <img src="${ep.poster}" alt="${ep.episode}">
         <div class="card-content">
           <h3>${ep.episode}</h3>
-          
-            <a href="${ep.downloadLink}">
-              <button class="download">
-                ⬇ Download
-              </button>
-            </a>
-          </div>
+          <a href="${ep.downloadLink}">
+            <button class="download">⬇ Download</button>
+          </a>
         </div>
       </div>
     `;
