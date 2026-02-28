@@ -149,10 +149,18 @@ fetch(jsonURL, { cache: "no-store" })
 });
 
 /* ===== WATCH NOW ===== */
+<script>
+
+/* ===== WATCH NOW ===== */
 function watchNow(link){
-  localStorage.setItem("videoLink", link);
-  window.location.href = "player.html";
+  if(link && link.trim() !== ""){
+    window.open(link, "_blank"); 
+  } else {
+    alert("Video link not available");
+  }
 }
+
+</script>
 </script>
 
 </body>
