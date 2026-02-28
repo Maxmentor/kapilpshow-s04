@@ -6,7 +6,6 @@
 <title>The Kapil Sharma Show | Netflix</title>
 
 <style>
-/* ===== RESET ===== */
 *{
   margin:0;
   padding:0;
@@ -14,13 +13,11 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* ===== BODY ===== */
 body{
   background:#000;
   color:#fff;
 }
 
-/* ===== HEADER ===== */
 .topbar{
   background:#111;
   padding:15px 20px;
@@ -30,7 +27,6 @@ body{
   letter-spacing:2px;
 }
 
-/* ===== GRID ===== */
 .container{
   padding:16px;
   display:grid;
@@ -38,25 +34,23 @@ body{
   gap:16px;
 }
 
-/* ===== CARD ===== */
 .card{
   background:#141414;
   border-radius:8px;
   overflow:hidden;
   transition:0.3s;
 }
+
 .card:hover{
   transform:scale(1.05);
 }
 
-/* ===== POSTER ===== */
 .card img{
   width:100%;
   height:260px;
   object-fit:cover;
 }
 
-/* ===== CONTENT ===== */
 .card-content{
   padding:10px;
 }
@@ -66,7 +60,6 @@ body{
   margin-bottom:8px;
 }
 
-/* ===== BUTTONS ===== */
 .buttons{
   display:flex;
   gap:8px;
@@ -89,9 +82,9 @@ button{
 .download{
   background:#333;
   color:#fff;
+  text-align:center;
 }
 
-/* ===== MOBILE ===== */
 @media(max-width:600px){
   .topbar{
     text-align:center;
@@ -106,25 +99,22 @@ button{
 
 <body>
 
-<!-- ===== HEADER ===== -->
 <div class="topbar">NETFLIX [Kapil Show S04 2026]</div>
 <br>
 <marquee>New Episode Upload Every Saturday........</marquee>
 
-<!-- ===== EPISODES ===== -->
 <div class="container" id="episodeList"></div>
 
 <script>
-/* ===== FETCH DATA.JSON WITH CACHE FIX ===== */
 
-// Har baar fresh load ke liye unique timestamp
+/* ===== FETCH DATA.JSON WITH CACHE FIX ===== */
 const jsonURL = "https://raw.githubusercontent.com/Maxmentor/kapilpshow-s04/refs/heads/main/data.json?v=" + new Date().getTime();
 
 fetch(jsonURL, { cache: "no-store" })
 .then(response => response.json())
 .then(episodes => {
   const list = document.getElementById("episodeList");
-  list.innerHTML = ""; // pehle container clear
+  list.innerHTML = "";
 
   episodes.forEach(ep => {
     list.innerHTML += `
@@ -133,12 +123,13 @@ fetch(jsonURL, { cache: "no-store" })
         <div class="card-content">
           <h3>${ep.episode}</h3>
           <div class="buttons">
-           <button class="watch" onclick="watchNow('${ep.watchLink}')">
+            <button class="watch" onclick="watchNow('${ep.watchLink}')">
               ▶ Watch Now
             </button>
-          <a href="${ep.downloadLink}">
-            <button class="download">⬇ Download</button>
-          </a>
+            <a href="${ep.downloadLink}" target="_blank">
+              <button class="download">⬇ Download</button>
+            </a>
+          </div>
         </div>
       </div>
     `;
@@ -148,20 +139,17 @@ fetch(jsonURL, { cache: "no-store" })
   console.error("JSON load error:", err);
 });
 
-/* ===== WATCH NOW ===== */
-<script>
 
-/* ===== WATCH NOW ===== */
+/* ===== WATCH NOW FUNCTION ===== */
 function watchNow(link){
   if(link && link.trim() !== ""){
-    window.open(link, "_blank"); 
+    window.open(link, "_blank");
   } else {
     alert("Video link not available");
   }
 }
 
 </script>
-
 
 </body>
 </html>
