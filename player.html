@@ -1,76 +1,128 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultimate MKV Player</title>
+    <title>Livestream - Premium Player</title>
     
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dplayer/dist/DPlayer.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sofia+Sans+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+        :root {
+            --primary-red: #dc3545;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --accent-gradient: linear-gradient(135deg, #ff4d4d 0%, #a70000 100%);
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #fff;
+            font-family: 'Sofia Sans Condensed', sans-serif;
+            margin: 0; padding: 0;
+        }
+
+        .names { background-color: var(--primary-red); text-align: center; padding: 12px; font-weight: bold; text-transform: uppercase; }
+
+        .play-area { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+        .input-box {
+            display: flex; background: var(--card-bg); padding: 8px;
+            border-radius: 50px; border: 1px solid #333; margin-bottom: 25px;
+        }
+
+        .input-box input { flex: 1; background: transparent; border: none; color: white; padding: 10px 20px; outline: none; }
+
+        .input-box button {
+            background: var(--accent-gradient); border: none; color: white;
+            padding: 10px 25px; border-radius: 40px; cursor: pointer; font-weight: bold;
+        }
+
+        #video-container {
+            width: 100%; display: none; border-radius: 12px;
+            overflow: hidden; border: 2px solid #333; background: #000;
+        }
+
+        /* Fullscreen hone par video poori screen cover kare */
+        .video-js { width: 100% !important; height: auto !important; aspect-ratio: 16/9; }
         
-        #dplayer { width: 100vw; height: 100vh; }
-
-        /* Force Landscape Overlay */
-        #play-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999; display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-            color: white; cursor: pointer; font-family: sans-serif;
-        }
-
-        .play-icon {
-            font-size: 60px; color: #ff0000; border: 3px solid #ff0000;
-            border-radius: 50%; width: 100px; height: 100px;
-            display: flex; justify-content: center; align-items: center;
-            margin-bottom: 15px;
-        }
+        /* Video wrapper for rotation */
+        .vjs-fullscreen #my-player { height: 100% !important; }
     </style>
 </head>
 <body>
 
-    <div id="play-overlay" onclick="initPlayer()">
-        <div class="play-icon">▶</div>
-        <p style="font-weight: bold; letter-spacing: 1px;">TAP TO START FULLSCREEN</p>
+    <div class="names">Premium Network Streamer</div>
+
+    <div class="play-area">
+        <div class="input-box">
+            <input type="text" id="video-url" placeholder="Paste your M3U8/MKV link here...">
+            <button onclick="startStreaming()">PLAY NOW</button>
+        </div>
+
+        <div id="video-container">
+            <video id="my-player" class="video-js vjs-big-play-centered vjs-theme-city" controls preload="auto" playsinline></video>
+        </div>
     </div>
 
-    <div id="dplayer"></div>
-
     <script>
-        const videoLink = localStorage.getItem("videoLink") || "APKA_LINK_YAHAN_DAALEIN";
+        // Player Initialize
+        var player = videojs('my-player');
 
-        function initPlayer() {
-            // 1. Hide Overlay
-            document.getElementById('play-overlay').style.display = 'none';
-
-            // 2. Fullscreen & Rotate Logic
-            const el = document.documentElement;
-            if (el.requestFullscreen) {
-                el.requestFullscreen();
-            } else if (el.webkitRequestFullscreen) {
-                el.webkitRequestFullscreen();
+        async function startStreaming() {
+            var url = $('#video-url').val();
+            if (!url) {
+                alert("Please enter a link!");
+                return;
             }
 
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(e => console.log("Rotate ignore"));
-            }
+            // 1. Show Container
+            $('#video-container').show();
 
-            // 3. Setup DPlayer
-            const dp = new DPlayer({
-                container: document.getElementById('dplayer'),
-                autoplay: true,
-                screenshot: true,
-                video: {
-                    url: videoLink,
-                    type: 'auto' // MKV ya M3U8 apne aap pehchan lega
-                },
-                theme: '#ff0000'
+            // 2. Set Source
+            player.src({
+                src: url,
+                type: (url.includes('m3u8')) ? 'application/x-mpegURL' : 'video/mp4'
             });
 
-            dp.play();
+            // 3. Request Fullscreen
+            var playerElement = document.getElementById('video-container');
+            
+            try {
+                if (playerElement.requestFullscreen) {
+                    await playerElement.requestFullscreen();
+                } else if (playerElement.webkitRequestFullscreen) {
+                    await playerElement.webkitRequestFullscreen();
+                }
+
+                // 4. Force Landscape (Wait 300ms for fullscreen transition)
+                setTimeout(async () => {
+                    if (screen.orientation && screen.orientation.lock) {
+                        await screen.orientation.lock('landscape').catch(function(error) {
+                            console.log("Orientation lock failed, system auto-rotate might be off.");
+                        });
+                    }
+                }, 300);
+
+            } catch (err) {
+                console.log("Fullscreen Error:", err);
+            }
+
+            // 5. Play Video
+            player.play();
         }
+
+        // Handle Fullscreen Exit (Unlock Orientation)
+        document.addEventListener('fullscreenchange', function() {
+            if (!document.fullscreenElement && screen.orientation.unlock) {
+                screen.orientation.unlock();
+            }
+        });
     </script>
 </body>
 </html>
